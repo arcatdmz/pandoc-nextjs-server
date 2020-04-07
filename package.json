@@ -7,7 +7,7 @@
   "license": "MIT",
   "scripts": {
     "build": "next build",
-    "start": "cross-env NODE_ENV=production next start",
+    "start": "cross-env NODE_ENV=production next start -p ${PORT:-3000}",
     "dev": "cross-env NODE_ENV=development next dev"
   },
   "dependencies": {
