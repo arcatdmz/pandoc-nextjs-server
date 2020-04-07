@@ -1,0 +1,31 @@
+{
+  "name": "pandoc-nextjs-server",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:arcatdmz/pandoc-nextjs-server.git",
+  "author": "Jun Kato <i@junkato.jp>",
+  "license": "MIT",
+  "scripts": {
+    "build": "next build",
+    "start": "cross-env NODE_ENV=production next start",
+    "dev": "cross-env NODE_ENV=development next dev"
+  },
+  "dependencies": {
+    "baseui": "^9.67.2",
+    "next": "^9.3.4",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "styletron-engine-atomic": "^1.4.6",
+    "styletron-react": "^5.2.7"
+  },
+  "devDependencies": {
+    "@types/node": "^13.11.0",
+    "@types/react": "^16.9.32",
+    "@types/react-dom": "^16.9.6",
+    "@types/styletron-engine-atomic": "^1.1.0",
+    "@types/styletron-react": "^5.0.2",
+    "@types/styletron-standard": "^2.0.0",
+    "cross-env": "^7.0.2",
+    "typescript": "^3.8.3"
+  }
+}

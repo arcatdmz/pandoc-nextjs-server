@@ -1,0 +1,11 @@
+node_modules/
+.dockerignore
+.editorconfig
+.git
+.gitignore
+.next
+.vscode
+Dockerfile
+node_modules
+README.md
+**/*.js
