@@ -27,6 +27,7 @@ class MyDocument extends Document<{ stylesheets: Sheet[] }> {
               key={i}
             />
           ))}
+          <link rel="stylesheet" href="/index.css" />
         </Head>
         <body>
           <Main />
