@@ -63,7 +63,7 @@ export const UploadStep: FC<IProps> = ({ onUpload }) => {
         });
       setErrorMessage("");
     },
-    [onUpload]
+    [onUpload, format]
   );
 
   const handleCancel = useCallback(() => {
