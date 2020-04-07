@@ -1,0 +1,8 @@
+{
+  "name": "pandoc-nextjs-server",
+  "description": "A simple web UI for Pandoc",
+  "repository": "https://github.com/arcatdmz/pandoc-nextjs-server",
+  "stack": "container",
+  "success_url": "/",
+  "website": "https://github.com/arcatdmz/pandoc-nextjs-server"
+}
