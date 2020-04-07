@@ -7,6 +7,7 @@ RUN echo node `node -v`
 RUN echo yarn v`yarn -v`
 RUN mkdir -p /work/uploads
 COPY . /work
+RUN chmod 755 /work/uploads
 RUN cd /work && yarn
 RUN cd /work && yarn build
 CMD cd /work && yarn start
