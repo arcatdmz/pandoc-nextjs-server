@@ -1,4 +1,4 @@
-FROM pandoc/latex:latest
+FROM k1low/alpine-pandoc-ja
 RUN apk add --no-cache bash curl nodejs
 RUN touch ~/.bashrc \
   && curl -o- -L https://yarnpkg.com/install.sh | bash \

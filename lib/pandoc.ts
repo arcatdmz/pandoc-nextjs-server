@@ -14,24 +14,14 @@ export async function pandoc(
   args: string[] = []
 ): Promise<IPandocResult> {
   return new Promise<IPandocResult>((r) => {
-    let result = "";
+    let stdOut = "",
+      stdErr = "";
 
-    const onStdOutData = function (data: string) {
-      result += data;
+    const onStdOutData = function (data: Buffer) {
+      stdOut += data.toString();
     };
-
-    const onStdOutEnd = function () {
-      r({
-        success: true,
-        result,
-      });
-    };
-
-    const onStdErrData = function (error: string) {
-      r({
-        success: false,
-        error,
-      });
+    const onStdErrData = function (data: Buffer) {
+      stdErr += data.toString();
     };
 
     const onStatCheck = function (err: Error, stats: Stats) {
@@ -43,12 +33,35 @@ export async function pandoc(
         return;
       }
       args.unshift(src);
-      args.push(...["-t", format, "-o", dest]);
+
+      // set special parameters for PDF output
+      if (format === "pdf") {
+        args.push(
+          "-V",
+          "documentclass=ltjarticle",
+          "-V",
+          "classoption=a4j",
+          "-V",
+          "geometry:margin=1in",
+          "--pdf-engine=lualatex"
+        );
+      } else {
+        args.push("-t", format);
+      }
+
+      args.push("-o", dest);
 
       const pdSpawn = spawn("pandoc", args);
       pdSpawn.stdout.on("data", onStdOutData);
-      pdSpawn.stdout.on("end", onStdOutEnd);
       pdSpawn.stderr.on("data", onStdErrData);
+      pdSpawn.on("exit", (code) => {
+        const success = code === 0;
+        r({
+          success,
+          result: stdOut,
+          error: stdErr,
+        });
+      });
       pdSpawn.on("error", (err) =>
         r({
           success: false,
