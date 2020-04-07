@@ -9,6 +9,7 @@ import { ParagraphMedium, HeadingSmall } from "baseui/typography";
 import { Layout } from "../../components/Layout";
 import { PandocStep } from "../../components/Steps";
 import { IStatus, UploadStatus } from "../../components/UploadStatus";
+import { useStyletron } from "baseui";
 
 interface IProps {
   file: string;
@@ -17,6 +18,7 @@ interface IProps {
 const Index: NextPage<IProps> = ({ file }) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [status, setStatus] = useState<IStatus>(null);
+  const [css] = useStyletron();
 
   useEffect(() => {
     if (typeof window === "undefined") {
@@ -53,9 +55,9 @@ const Index: NextPage<IProps> = ({ file }) => {
       {loading || !status ? (
         <FlexGrid alignItems="center" justifyContent="center" height="100%">
           <FlexGridItem>
-            <p style={{ textAlign: "center" }}>
+            <div className={css({ textAlign: "center" })}>
               <Spinner />
-            </p>
+            </div>
           </FlexGridItem>
         </FlexGrid>
       ) : (
