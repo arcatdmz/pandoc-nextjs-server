@@ -4,11 +4,11 @@ import Router from "next/router";
 import axios from "axios";
 import { FlexGrid, FlexGridItem } from "baseui/flex-grid";
 import { StyledSpinnerNext as Spinner } from "baseui/spinner";
+import { ParagraphMedium, HeadingSmall } from "baseui/typography";
 
 import { Layout } from "../../components/Layout";
 import { PandocStep } from "../../components/Steps";
 import { IStatus, UploadStatus } from "../../components/UploadStatus";
-import { ParagraphMedium } from "baseui/typography";
 
 interface IProps {
   file: string;
@@ -44,7 +44,7 @@ const Index: NextPage<IProps> = ({ file }) => {
     return () => (fetch = null);
   }, []);
 
-  const handleDownload = useCallback(({ name }) => {
+  const handleDownload = useCallback((name: string) => {
     Router.push(`/download/${name}`);
   }, []);
 
@@ -60,8 +60,9 @@ const Index: NextPage<IProps> = ({ file }) => {
         </FlexGrid>
       ) : (
         <>
+          <HeadingSmall marginTop="0">File conversion status</HeadingSmall>
           <UploadStatus status={status} onDownload={handleDownload} />
-          <ParagraphMedium>
+          <ParagraphMedium padding=".2em">
             Once the file is ready, the button above gets enabled. The
             conversion status is updated every second.
           </ParagraphMedium>

@@ -1,12 +1,11 @@
 import { FC } from "react";
 import Head from "next/head";
+import { useStyletron } from "baseui";
 import { FlexGrid, FlexGridItem } from "baseui/flex-grid";
 import { Grid, Cell } from "baseui/layout-grid";
 
 import { Header } from "../components/Header";
 import { Steps, PandocStep } from "../components/Steps";
-import { useStyletron } from "baseui";
-import { ParagraphMedium } from "baseui/typography";
 
 interface IProps {
   title?: string;
