@@ -5,7 +5,7 @@ RUN touch ~/.bashrc \
   && ln -s "$HOME/.yarn/bin/yarn" /usr/local/bin/yarn
 RUN echo node v`node -v`
 RUN echo yarn v`yarn -v`
-RUN mkdir -p /work
+RUN mkdir -p /work/uploads
 COPY . /work
 RUN cd /work && yarn
 RUN cd /work && yarn build
