@@ -1,13 +1,19 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { resolve } from "path";
-import { readFile } from "fs";
+import { unlink } from "fs";
 import sanitize from "sanitize-filename";
 
 import appConfig from "./_config";
 
+export const config = {
+  api: {
+    bodyParser: true,
+  },
+};
+
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   // get file name
-  const { file } = req.query;
+  const { file } = req.body;
   if (typeof file !== "string") {
     res.json({
       success: false,
@@ -18,7 +24,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
   // sanitize file name
   const sanitized = sanitize(file);
-  if (sanitized !== file) {
+  if (sanitized !== file || file.endsWith(".meta.json")) {
     res.json({
       success: false,
       error: "Unsafe file name specified",
@@ -26,21 +32,18 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     return;
   }
 
-  // return file status
-  const sanitizedPath = resolve(appConfig.uploadDir, `${sanitized}.meta.json`);
-  readFile(sanitizedPath, (err, data) => {
+  // remove the specified file
+  const sanitizedPath = resolve(appConfig.uploadDir, sanitized);
+  unlink(sanitizedPath, (err) => {
     if (err) {
       res.json({
         success: false,
-        error: "File not found",
+        error: err.message,
       });
       return;
     }
-    const status = JSON.parse(data.toString());
-    delete status.originalName;
     res.json({
       success: true,
-      status,
     });
   });
 };

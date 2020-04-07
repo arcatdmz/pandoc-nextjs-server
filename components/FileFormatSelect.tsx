@@ -1,5 +1,6 @@
 import { FC, useCallback, useState } from "react";
 import { Select, Value, OnChangeParams } from "baseui/select";
+import appConfig from "../pages/api/_config";
 
 interface IProps {
   onSelect(value: IFileFormat): void;
@@ -10,15 +11,7 @@ export interface IFileFormat {
   value: string;
 }
 
-export const formats: IFileFormat[] = [
-  { id: "Adobe PDF (.pdf)", value: "pdf" },
-  { id: "HTML (.html)", value: "html" },
-  { id: "GitHub-Flavored Markdown (.md)", value: "gfm" },
-  { id: "Pandoc's Markdown (.md)", value: "markdown" },
-  { id: "reStructuredText (.rst)", value: "rst" },
-  { id: "Rich Text Format (.rtf)", value: "rtf" },
-  { id: "Microsoft Word (.docx)", value: "docx" },
-];
+export const formats: IFileFormat[] = appConfig.formats;
 
 export const FileFormatSelect: FC<IProps> = ({ onSelect }) => {
   const [value, setValue] = useState<Value>([formats[0]]);
