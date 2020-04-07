@@ -23,11 +23,18 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     file.path = resolve(form.uploadDir, name);
   });
 
-  form.parse(req, (err, _fields, filesMap) => {
+  form.parse(req, (err, fields, filesMap) => {
     if (err) {
       res.json({
         success: false,
         error: err,
+      });
+      return;
+    }
+    if (!fields || typeof fields.format !== "string") {
+      res.json({
+        success: false,
+        error: "Destination file format not specified",
       });
       return;
     }

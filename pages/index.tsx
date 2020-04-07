@@ -1,15 +1,22 @@
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { NextPage } from "next";
 import axios from "axios";
+import { FormControl } from "baseui/form-control";
 import { FileUploader } from "baseui/file-uploader";
 import { FlexGrid, FlexGridItem } from "baseui/flex-grid";
 import { Grid, Cell } from "baseui/layout-grid";
 
 import { Header } from "../components/Header";
 import { Steps, PandocStep } from "../components/Steps";
+import {
+  IFileFormat,
+  FileFormatSelect,
+  formats,
+} from "../components/FileFormatSelect";
 
 const Index: NextPage = () => {
   const [errorMessage, setErrorMessage] = useState("");
+  const [format, setFormat] = useState<IFileFormat>(formats[0]);
   const [progress, setProgress] = useState<number | null>(null);
 
   const handleUploadProgress = useCallback((progressEvent) => {
@@ -33,11 +40,24 @@ const Index: NextPage = () => {
       acceptedFiles.forEach((file, i) => {
         data.append(`files[${i}]`, file);
       });
+      data.append("format", format.value);
       axios
         .post("/api/upload", data, {
           onUploadProgress: handleUploadProgress,
+          responseType: "json",
         })
-        .then(() => {});
+        .then((res) => {
+          if (!res || !res.data) {
+            setErrorMessage("Unknown error occurred");
+            return;
+          }
+          if (!res.data.success) {
+            setErrorMessage(res.data.error || "Something wrong happened");
+            return;
+          }
+          // TODO implement conversion step
+          console.log("File is being converted", res.data);
+        });
       setErrorMessage("");
     },
     []
@@ -71,8 +91,11 @@ const Index: NextPage = () => {
               <Steps step={PandocStep.Upload} />
             </Cell>
             <Cell span={[5, 6]}>
+              <FormControl label="Destination file format:">
+                <FileFormatSelect onSelect={setFormat} />
+              </FormControl>
               <FileUploader
-                // multiple={false}
+                multiple={false}
                 onCancel={handleCancel}
                 onDrop={handleDrop}
                 onRetry={handleRetry}
