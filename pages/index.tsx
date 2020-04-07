@@ -1,60 +1,56 @@
+import { useEffect, useRef, useState, useCallback } from "react";
 import { NextPage } from "next";
+import axios from "axios";
 import { FileUploader } from "baseui/file-uploader";
-import { useEffect, useRef, useState } from "react";
-import { Header } from "../components/Header";
 import { FlexGrid, FlexGridItem } from "baseui/flex-grid";
+import { Grid, Cell } from "baseui/layout-grid";
 
-// https://overreacted.io/making-setinterval-declarative-with-react-hooks/
-function useInterval(callback: any, delay: number | null) {
-  const savedCallback = useRef(() => {});
-  // Remember the latest callback.
-  useEffect(() => {
-    savedCallback.current = callback;
-  }, [callback]);
-  // Set up the interval.
-  useEffect((): any => {
-    function tick() {
-      savedCallback.current();
-    }
-    if (delay !== null) {
-      let id = setInterval(tick, delay);
-      return () => clearInterval(id);
-    }
-  }, [delay]);
-}
-// useFakeProgress is an elaborate way to show a fake file transfer for illustrative purposes. You
-// don't need this is your application. Use metadata from your upload destination if it's available,
-// or don't provide progress.
-function useFakeProgress(): [number, () => void, () => void] {
-  const [fakeProgress, setFakeProgress] = useState(0);
-  const [isActive, setIsActive] = useState(false);
-  function stopFakeProgress() {
-    setIsActive(false);
-    setFakeProgress(0);
-  }
-  function startFakeProgress() {
-    setIsActive(true);
-  }
-  useInterval(
-    () => {
-      if (fakeProgress >= 100) {
-        stopFakeProgress();
-      } else {
-        setFakeProgress(fakeProgress + 10);
-      }
-    },
-    isActive ? 500 : null
-  );
-  return [fakeProgress, startFakeProgress, stopFakeProgress];
-}
+import { Header } from "../components/Header";
+import { Steps, PandocStep } from "../components/Steps";
 
 const Index: NextPage = () => {
   const [errorMessage, setErrorMessage] = useState("");
-  const [
-    progressAmount,
-    startFakeProgress,
-    stopFakeProgress,
-  ] = useFakeProgress();
+  const [progress, setProgress] = useState<number | null>(null);
+
+  const handleUploadProgress = useCallback((progressEvent) => {
+    setProgress(Math.round((progressEvent.loaded * 100) / progressEvent.total));
+  }, []);
+
+  const handleDrop = useCallback(
+    (acceptedFiles: File[], rejectedFiles: File[]) => {
+      // handle errors
+      if (rejectedFiles.length > 0) {
+        if (rejectedFiles.length > 1) {
+          setErrorMessage("Too many files");
+          return;
+        }
+        setErrorMessage("Something wrong happened");
+        return;
+      }
+
+      // start uploading a file
+      const data = new FormData();
+      acceptedFiles.forEach((file, i) => {
+        data.append(`files[${i}]`, file);
+      });
+      axios
+        .post("/api/upload", data, {
+          onUploadProgress: handleUploadProgress,
+        })
+        .then(() => {});
+      setErrorMessage("");
+    },
+    []
+  );
+
+  const handleCancel = useCallback(() => {
+    setErrorMessage("Upload cancelled");
+  }, []);
+
+  const handleRetry = useCallback(() => {
+    setProgress(null);
+    setErrorMessage("");
+  }, []);
 
   return (
     <>
@@ -70,21 +66,24 @@ const Index: NextPage = () => {
         left="0"
       >
         <FlexGridItem>
-          <FileUploader
-            multiple={false}
-            onCancel={stopFakeProgress}
-            onDrop={(acceptedFiles, rejectedFiles) => {
-              // handle file upload...
-              console.log(acceptedFiles, rejectedFiles);
-              startFakeProgress();
-            }}
-            // progressAmount is a number from 0 - 100 which indicates the percent of file transfer completed
-            progressAmount={progressAmount}
-            progressMessage={
-              progressAmount ? `Uploading... ${progressAmount}% of 100%` : ""
-            }
-            errorMessage={errorMessage}
-          />
+          <Grid>
+            <Cell span={[3, 2]}>
+              <Steps step={PandocStep.Upload} />
+            </Cell>
+            <Cell span={[5, 6]}>
+              <FileUploader
+                // multiple={false}
+                onCancel={handleCancel}
+                onDrop={handleDrop}
+                onRetry={handleRetry}
+                progressAmount={progress}
+                progressMessage={
+                  progress ? `Uploading... ${progress}% of 100%` : ""
+                }
+                errorMessage={errorMessage}
+              />
+            </Cell>
+          </Grid>
         </FlexGridItem>
       </FlexGrid>
     </>
