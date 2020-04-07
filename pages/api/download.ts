@@ -1,9 +1,9 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { resolve } from "path";
-import { readFile, unlink, createReadStream } from "fs";
+import { unlink, createReadStream, lstat } from "fs";
 import sanitize from "sanitize-filename";
 
-import appConfig from "./_config";
+import appConfig from "../../lib/config";
 
 export const config = {
   api: {
@@ -46,29 +46,31 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
   // read file
   const sanitizedPath = resolve(appConfig.uploadDir, `${sanitized}.${ext}`);
-  const stream = createReadStream(sanitizedPath);
+  lstat(sanitizedPath, (err, stats) => {
+    // emit error
+    if (err || !stats.isFile()) {
+      res.writeHead(301, { Location: "/404" });
+      res.end();
+      return;
+    }
 
-  // emit file info
-  res.writeHead(200, {
-    "Content-Type": format.mime,
-    "Content-disposition": `attachment; filename=${sanitized}.${ext}`,
-  });
+    // emit file info
+    res.writeHead(200, {
+      "Content-Type": format.mime,
+      "Content-disposition": `attachment; filename=${sanitized}.${ext}`,
+    });
 
-  // remove the specified file after sending it
-  stream.on("close", () => {
-    unlink(sanitizedPath, (_err) => {
-      //
+    // emit file body
+    const stream = createReadStream(sanitizedPath);
+    stream.pipe(res);
+
+    // remove the specified file after sending it
+    stream.on("close", () => {
+      unlink(sanitizedPath, (_err) => {
+        //
+      });
     });
   });
-
-  // emit error response
-  stream.on("error", (err) => {
-    res.writeHead(301, { Location: "/404" });
-    res.end();
-  });
-
-  // emit file body
-  stream.pipe(res);
 };
 
 export default handler;

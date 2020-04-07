@@ -3,7 +3,7 @@ import { resolve } from "path";
 import { readFile } from "fs";
 import sanitize from "sanitize-filename";
 
-import appConfig from "./_config";
+import appConfig from "../../lib/config";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   // get file name

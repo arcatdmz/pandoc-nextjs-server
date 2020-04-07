@@ -3,7 +3,7 @@ import { useStyletron } from "baseui";
 import { Button } from "baseui/button";
 import { ListItem, ListItemLabel } from "baseui/list";
 
-import appConfig from "../pages/api/_config";
+import appConfig from "../lib/config";
 
 export interface IStatus {
   name: string;

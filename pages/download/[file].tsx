@@ -8,7 +8,7 @@ import { Layout } from "../../components/Layout";
 import { PandocStep } from "../../components/Steps";
 import { IStatus } from "../../components/UploadStatus";
 
-import appConfig from "../api/_config";
+import appConfig from "../../lib/config";
 
 interface IProps {
   status: IStatus;

@@ -1,7 +1,7 @@
 import { FC, useCallback, useState } from "react";
 import { Select, Value, OnChangeParams } from "baseui/select";
 
-import appConfig from "../pages/api/_config";
+import appConfig from "../lib/config";
 
 interface IProps {
   onSelect(value: IFileFormat): void;

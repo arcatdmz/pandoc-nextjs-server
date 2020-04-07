@@ -4,8 +4,8 @@ import { v4 as uuidv4 } from "uuid";
 import { extname, resolve } from "path";
 import { unlink, writeFile } from "fs";
 
-import appConfig from "./_config";
-import { pandoc } from "./_pandoc";
+import appConfig from "../../lib/config";
+import { pandoc } from "../../lib/pandoc";
 
 export const config = {
   api: {
