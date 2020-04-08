@@ -4,7 +4,7 @@
 
 Upload, convert, and download the file with ease.
 
-Demo site: https://pandoc-nextjs-server.herokuapp.com/
+Demo site: https://pandoc.digitalmuseum.jp/
 
 ![Screenshot](https://i.gyazo.com/9ad5ea13216154750470b0659157facb.png)
 
