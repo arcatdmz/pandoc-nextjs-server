@@ -127,12 +127,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             }
           );
 
-          // clean up on error
-          if (!res.success) {
-            unlink(path, (_err) => {
-              // do nothing on clean up error
-            });
-          }
+          // clean up source file
+          unlink(path, (_err) => {
+            // do nothing on clean up error
+          });
         });
       }
     );
