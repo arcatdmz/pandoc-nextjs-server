@@ -1,6 +1,6 @@
 import { Provider as StyletronProvider } from "styletron-react";
 import { LightTheme, BaseProvider } from "baseui";
-import { styletron, debug } from "../styletron";
+import { styletron, debug } from "../lib/styletron";
 
 const MyApp = ({ Component, pageProps }) => (
   <StyletronProvider value={styletron} debug={debug} debugAfterHydration>
