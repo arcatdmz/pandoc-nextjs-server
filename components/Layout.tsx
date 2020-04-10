@@ -18,7 +18,9 @@ export const Layout: FC<IProps> = ({ title, step, children }) => {
     <>
       <Head>
         <title>{title ? `${title} | ` : ""}pandoc-nextjs-server</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-fork-ribbon-css/0.2.3/gh-fork-ribbon.min.css" />
       </Head>
+      <a class="github-fork-ribbon" href="https://github.com/arcatdmz/pandoc-nextjs-server" data-ribbon="Fork me on GitHub" title="Fork me on GitHub">Fork me on GitHub</a>
       <div
         className={css({
           position: "fixed",
