@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { NextPage } from "next";
 import Router from "next/router";
 import axios from "axios";
+import { useStyletron } from "baseui";
 import { FlexGrid, FlexGridItem } from "baseui/flex-grid";
 import { StyledSpinnerNext as Spinner } from "baseui/spinner";
 import { ParagraphMedium, HeadingSmall } from "baseui/typography";
@@ -9,7 +10,6 @@ import { ParagraphMedium, HeadingSmall } from "baseui/typography";
 import { Layout } from "../../components/Layout";
 import { PandocStep } from "../../components/Steps";
 import { IStatus, UploadStatus } from "../../components/UploadStatus";
-import { useStyletron } from "baseui";
 
 interface IProps {
   file: string;

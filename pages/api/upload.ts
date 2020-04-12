@@ -5,23 +5,14 @@ import { extname, resolve } from "path";
 import { unlink, writeFile } from "fs";
 
 import appConfig from "../../lib/config";
-import { pandoc } from "../../lib/pandoc";
+import { writeMetaFile, IStatus } from "../../lib/writeMetaFile";
+import { convert } from "../../lib/convert";
 
 export const config = {
   api: {
     bodyParser: false,
   },
 };
-
-interface IStatus {
-  name: string;
-  originalName: string;
-  format: string;
-  date: string;
-  success?: boolean;
-  error?: string;
-  result?: string;
-}
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   // use formidable to parse form data
@@ -66,7 +57,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const files = Object.values(filesMap);
     if (files.length > 1) {
       Promise.all(files.map((file) => new Promise((r) => unlink(file.path, r))))
-        .catch((err) => {
+        .catch((_err) => {
           // do nothing for file deletion errors
         })
         .finally(() =>
@@ -86,54 +77,33 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       format: format.value,
       date: new Date().toISOString(),
     };
-    writeFile(
-      resolve(appConfig.uploadDir, `${name}.meta.json`),
-      JSON.stringify(status),
-      { encoding: "utf8" },
-      (err) => {
-        // clean up on error
-        if (err) {
-          res.json({
-            success: false,
-            error: "Writing a meta file failed",
-          });
-          unlink(path, (_err) => {
-            // do nothing on clean up error
-          });
-          return;
-        }
-
-        // return the name of the uploaded file
+    writeMetaFile(status).then((err) => {
+      // clean up on error
+      if (err) {
         res.json({
-          success: true,
-          name,
+          success: false,
+          error: "Writing a meta file failed",
         });
-
-        // start conversion
-        pandoc(
-          path,
-          `${path}.${format.ext || format.value}`,
-          format.value
-        ).then((res) => {
-          status.success = res.success;
-          status.error = res.error;
-          status.result = res.result;
-          writeFile(
-            resolve(appConfig.uploadDir, `${name}.meta.json`),
-            JSON.stringify(status),
-            { encoding: "utf8" },
-            (_err) => {
-              // do nothing on meta file write error
-            }
-          );
-
-          // clean up source file
-          unlink(path, (_err) => {
-            // do nothing on clean up error
-          });
+        unlink(path, (_err) => {
+          // do nothing on clean up error
         });
+        return;
       }
-    );
+
+      // return the name of the uploaded file
+      res.json({
+        success: true,
+        name,
+      });
+
+      // start conversion
+      convert(
+        path,
+        `${path}.${format.ext || format.value}`,
+        format.value,
+        status
+      );
+    });
   });
 };
 

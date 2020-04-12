@@ -1,7 +1,7 @@
 import { spawn } from "child_process";
 import { stat, Stats } from "fs";
 
-interface IPandocResult {
+export interface IPandocResult {
   success: boolean;
   error?: string;
   result?: string;
