@@ -19,6 +19,7 @@
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "sanitize-filename": "^1.6.3",
+    "sb2md": "https://github.com/arcatdmz/sb2md.git",
     "styletron-engine-atomic": "^1.4.6",
     "styletron-react": "^5.2.7",
     "uuid": "^7.0.3"
