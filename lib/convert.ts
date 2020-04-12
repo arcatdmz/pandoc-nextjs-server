@@ -2,6 +2,7 @@ import { unlink } from "fs";
 
 import { pandoc } from "./pandoc";
 import { writeMetaFile, IStatus } from "./writeMetaFile";
+import { parseScrapbox } from "./scrapbox";
 
 export async function convert(
   src: string,
@@ -9,6 +10,15 @@ export async function convert(
   format: string,
   status: IStatus
 ): Promise<void> {
+  // check if source is a JSON file exported from Scrapbox
+  const sb = await parseScrapbox(src);
+  if (sb) {
+    status.scrapbox = true;
+    writeMetaFile(status);
+    return;
+  }
+
+  // convert with pandoc
   return pandoc(src, dest, format, []).then((res) => {
     status.success = res.success;
     status.error = res.error;

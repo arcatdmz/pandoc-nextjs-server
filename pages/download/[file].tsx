@@ -6,9 +6,9 @@ import { ParagraphMedium, HeadingSmall } from "baseui/typography";
 
 import { Layout } from "../../components/Layout";
 import { PandocStep } from "../../components/Steps";
-import { IStatus } from "../../components/UploadStatus";
 
 import appConfig from "../../lib/config";
+import { IStatus } from "../../lib/writeMetaFile";
 
 interface IProps {
   status: IStatus;

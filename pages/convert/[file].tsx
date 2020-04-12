@@ -9,7 +9,9 @@ import { ParagraphMedium, HeadingSmall } from "baseui/typography";
 
 import { Layout } from "../../components/Layout";
 import { PandocStep } from "../../components/Steps";
-import { IStatus, UploadStatus } from "../../components/UploadStatus";
+import { UploadStatus } from "../../components/UploadStatus";
+
+import { IStatus } from "../../lib/writeMetaFile";
 
 interface IProps {
   file: string;
@@ -60,6 +62,10 @@ const Index: NextPage<IProps> = ({ file }) => {
             </div>
           </FlexGridItem>
         </FlexGrid>
+      ) : status.scrapbox ? (
+        <>
+          <HeadingSmall marginTop="0">Scrapbox</HeadingSmall>
+        </>
       ) : (
         <>
           <HeadingSmall marginTop="0">File conversion status</HeadingSmall>

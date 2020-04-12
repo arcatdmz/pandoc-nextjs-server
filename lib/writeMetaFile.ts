@@ -8,6 +8,7 @@ export interface IStatus {
   originalName: string;
   format: string;
   date: string;
+  scrapbox?: boolean;
   success?: boolean;
   error?: string;
   result?: string;

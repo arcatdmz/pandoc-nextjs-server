@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { IncomingForm } from "formidable";
 import { v4 as uuidv4 } from "uuid";
 import { extname, resolve } from "path";
-import { unlink, writeFile } from "fs";
+import { unlink } from "fs";
 
 import appConfig from "../../lib/config";
 import { writeMetaFile, IStatus } from "../../lib/writeMetaFile";

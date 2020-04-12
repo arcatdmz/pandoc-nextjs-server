@@ -3,9 +3,17 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { IStatus } from "../../lib/writeMetaFile";
 import { readMetaFile } from "../../lib/readMetaFile";
 
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: "1kb",
+    },
+  },
+};
+
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   // get file name
-  const { file } = req.query;
+  const { file } = req.body;
 
   // read current status
   let status: IStatus;
@@ -20,7 +28,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     return;
   }
 
-  // return the status
+  // TODO: convert Scrapbox data
   delete status.originalName;
   res.json({
     success: true,

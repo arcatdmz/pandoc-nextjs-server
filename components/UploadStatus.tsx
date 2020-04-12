@@ -4,15 +4,7 @@ import { Button } from "baseui/button";
 import { ListItem, ListItemLabel } from "baseui/list";
 
 import appConfig from "../lib/config";
-
-export interface IStatus {
-  name: string;
-  format: string;
-  date: string;
-  success?: boolean;
-  error?: string;
-  result?: string;
-}
+import { IStatus } from "../lib/writeMetaFile";
 
 interface IProps {
   status: IStatus;
