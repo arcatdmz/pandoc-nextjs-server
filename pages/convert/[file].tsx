@@ -12,6 +12,7 @@ import { PandocStep } from "../../components/Steps";
 import { UploadStatus } from "../../components/UploadStatus";
 
 import { IStatus } from "../../lib/writeMetaFile";
+import { ScrapboxForm } from "../../components/ScrapboxForm";
 
 interface IProps {
   file: string;
@@ -19,37 +20,55 @@ interface IProps {
 
 const Index: NextPage<IProps> = ({ file }) => {
   const [loading, setLoading] = useState<boolean>(true);
+  const [polling, setPolling] = useState<boolean>(true);
   const [status, setStatus] = useState<IStatus>(null);
   const [css] = useStyletron();
 
+  const fetch = useCallback(async () => {
+    let status: IStatus;
+    try {
+      const res = await axios.get("/api/status", {
+        params: {
+          file,
+        },
+        responseType: "json",
+      });
+      if (res.data && res.data.success) {
+        status = res.data.status;
+      }
+    } catch (e) {
+      return null;
+    }
+    return status;
+  }, []);
+
   useEffect(() => {
-    if (typeof window === "undefined") {
+    if (typeof window === "undefined" || !polling) {
       return;
     }
-    let fetch: Function = () => {
-      axios
-        .get("/api/status", {
-          params: {
-            file,
-          },
-          responseType: "json",
-        })
-        .then((res) => {
-          setLoading(false);
-          if (res.data && res.data.success) {
-            setStatus(res.data.status);
-          }
-          if (fetch) {
-            setTimeout(fetch, 1000);
-          }
-        });
-    };
-    fetch();
-    return () => (fetch = null);
-  }, []);
+    let doFetch = () =>
+      fetch().then((status) => {
+        if (!doFetch || !polling) {
+          return;
+        }
+        setLoading(false);
+        setStatus(status);
+        if (status.scrapbox) {
+          setPolling(false);
+        } else {
+          setTimeout(doFetch, 1000);
+        }
+      });
+    doFetch();
+    return () => (doFetch = null);
+  }, [fetch, polling]);
 
   const handleDownload = useCallback((name: string) => {
     Router.push(`/download/${name}`);
+  }, []);
+
+  const handleSubmit = useCallback(() => {
+    setPolling(true);
   }, []);
 
   return (
@@ -64,7 +83,12 @@ const Index: NextPage<IProps> = ({ file }) => {
         </FlexGrid>
       ) : status.scrapbox ? (
         <>
-          <HeadingSmall marginTop="0">Scrapbox</HeadingSmall>
+          <HeadingSmall marginTop="0">Scrapbox options</HeadingSmall>
+          <ScrapboxForm status={status} onSubmit={handleSubmit} />
+          <ParagraphMedium padding=".2em">
+            Specify options for converting Scrapbox pages and click the convert
+            button.
+          </ParagraphMedium>
         </>
       ) : (
         <>
