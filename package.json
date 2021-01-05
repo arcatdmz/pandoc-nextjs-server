@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@types/formidable": "^1.0.31",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "baseui": "^9.67.2",
     "formidable": "^1.2.2",
     "next": "^9.3.4",
