@@ -56,7 +56,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     // check uploaded files
     const files = Object.values(filesMap);
     if (files.length > 1) {
-      Promise.all(files.map((file) => new Promise((r) => unlink(file.path, r))))
+      Promise.all(files.map((file) => new Promise((r) => !Array.isArray(file) && unlink(file.path, r))))
         .catch((_err) => {
           // do nothing for file deletion errors
         })
@@ -68,7 +68,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         );
       return;
     }
-    const { name, path } = files[0];
+    const file = !Array.isArray(files[0]) && files[0] || { name: null, path: null };
+    const { name, path } = file;
 
     // write meta file
     const status: IStatus = {
