@@ -1,5 +1,5 @@
 FROM k1low/alpine-pandoc-ja
-RUN apk add --no-cache bash curl nodejs
+RUN apk add --no-cache bash curl nodejs npm
 RUN echo node `node -v`
 RUN echo npm v`npm -v`
 RUN mkdir -p /work/uploads
