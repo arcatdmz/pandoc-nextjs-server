@@ -7,7 +7,7 @@
 Upload, convert, and download the file with ease.
 
 - Demo site: https://pandoc.digitalmuseum.jp
-- Docker image: http://hub.docker.com/repository/docker/arcatdmz/pandoc-nextjs-server (built with [GitHub Actions]())
+- Docker image: [arcatdmz/pandoc-nextjs-server](http://hub.docker.com/repository/docker/arcatdmz/pandoc-nextjs-server) (built with [GitHub Actions]())
 
 ![Screenshot](https://i.gyazo.com/9ad5ea13216154750470b0659157facb.png)
 
