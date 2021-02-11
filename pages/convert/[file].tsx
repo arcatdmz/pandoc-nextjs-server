@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { NextPage } from "next";
-import Router from "next/router";
+import Router, { useRouter } from "next/router";
 import axios from "axios";
 import { useStyletron } from "baseui";
 import { FlexGrid, FlexGridItem } from "baseui/flex-grid";
@@ -14,15 +14,19 @@ import { UploadStatus } from "../../components/UploadStatus";
 import { IStatus } from "../../lib/writeMetaFile";
 import { ScrapboxForm } from "../../components/ScrapboxForm";
 
-interface IProps {
-  file: string;
-}
-
-const Index: NextPage<IProps> = ({ file }) => {
+const Index: NextPage = () => {
+  const [file, setFile] = useState<string>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [polling, setPolling] = useState<boolean>(true);
   const [status, setStatus] = useState<IStatus>(null);
   const [css] = useStyletron();
+
+  const router = useRouter();
+  useEffect(() => {
+    if (router.asPath !== router.route) {
+      setFile(router.query.file as string);
+    }
+  }, [router]);
 
   const fetch = useCallback(async () => {
     let status: IStatus;
@@ -40,7 +44,7 @@ const Index: NextPage<IProps> = ({ file }) => {
       return null;
     }
     return status;
-  }, []);
+  }, [file]);
 
   useEffect(() => {
     if (typeof window === "undefined" || !polling) {
@@ -102,15 +106,6 @@ const Index: NextPage<IProps> = ({ file }) => {
       )}
     </Layout>
   );
-};
-
-Index.getInitialProps = async ({ query }) => {
-  const { file } = query;
-  if (typeof file === "string") {
-    return { file };
-  } else {
-    return { file: null };
-  }
 };
 
 export default Index;
