@@ -1,0 +1,71 @@
+name: Build and deploy Docker app to Azure
+on:
+  push:
+    branches:
+      - main
+env:
+  AZURE_WEBAPP_NAME: pandoc-server
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set env vars
+        run: |
+          IMAGE_PATH=${{ github.repository }}
+          IMAGE_PATH=$(echo ${IMAGE_PATH} | tr '[A-Z]' '[a-z]')
+          echo "IMAGE_PATH=${IMAGE_PATH}" >> ${GITHUB_ENV}
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Build image
+        run: docker build -t ${IMAGE_PATH} .
+      - name: Docker login
+        run: echo "${{ secrets.DH_TOKEN }}" | docker login -u ${{ secrets.DH_USERNAME }} --password-stdin
+      - name: Docker push
+        run: docker push ${IMAGE_PATH}
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Set env vars
+        run: |
+          IMAGE_PATH=${{ github.repository }}
+          IMAGE_PATH=$(echo ${IMAGE_PATH} | tr '[A-Z]' '[a-z]')
+          echo "IMAGE_PATH=${IMAGE_PATH}" >> ${GITHUB_ENV}
+      - name: Azure authentication
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: Set Web App Docker Hub authentication
+        uses: Azure/appservice-settings@v1
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          app-settings-json: |
+            [
+              {
+                "name": "DOCKER_REGISTRY_SERVER_PASSWORD",
+                "value": "${{ secrets.DH_TOKEN }}",
+                "slotSetting": false
+              },
+              {
+                "name": "DOCKER_REGISTRY_SERVER_URL",
+                "value": "https://index.docker.io",
+                "slotSetting": false
+              },
+              {
+                "name": "DOCKER_REGISTRY_SERVER_USERNAME",
+                "value": "${{ secrets.DH_USERNAME }}",
+                "slotSetting": false
+              },
+              {
+                "name": "WEBSITES_PORT",
+                "value": "3000",
+                "slotSetting": false
+              }
+            ]
+      - name: Deploy to Azure Web App for Container
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          images: ${{ env.IMAGE_PATH }}:latest
