@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { NextPage } from "next";
+import { GetServerSideProps, NextPage } from "next";
 import axios from "axios";
 import { Button } from "baseui/button";
 import { ParagraphMedium, HeadingSmall } from "baseui/typography";
@@ -12,6 +12,10 @@ import { IStatus } from "../../lib/writeMetaFile";
 
 interface IProps {
   status: IStatus;
+}
+
+interface IPageProps {
+  file: string;
 }
 
 const Index: NextPage<IProps> = ({ status }) => {
@@ -36,8 +40,8 @@ const Index: NextPage<IProps> = ({ status }) => {
   );
 };
 
-Index.getInitialProps = async ({ query }) => {
-  const { file } = query;
+export const getServerSideProps: GetServerSideProps<IProps> = async (ctx) => {
+  const { file } = ctx.query;
   if (typeof file === "string") {
     try {
       const res = await axios.get("http://localhost:3000/api/status", {
@@ -47,13 +51,13 @@ Index.getInitialProps = async ({ query }) => {
         responseType: "json",
       });
       if (res.data && res.data.success) {
-        return { status: res.data.status };
+        return { props: { status: res.data.status } };
       }
     } catch (err) {
       // do nothing
     }
   }
-  return { status: null };
+  return { props: { status: null } };
 };
 
 export default Index;
