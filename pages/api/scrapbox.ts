@@ -18,7 +18,6 @@ export const config = {
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   // get file name
-  // FIXME get filter, openings, and endings
   const { file } = req.body;
 
   // read current status
@@ -44,11 +43,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   // start conversion
   const path = resolve(appConfig.uploadDir, status.name);
   const format = appConfig.formats.find((f) => f.value === status.format);
-  const result = await scrapbox(path, {
-    filter: null,
-    openings: [],
-    endings: [],
-  });
+  const result = await scrapbox(
+    path,
+    appConfig.formats.find((f) => f.value === "markdown").options
+  );
 
   // clean up source file
   unlink(path, (_err) => {

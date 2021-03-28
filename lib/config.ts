@@ -1,3 +1,5 @@
+import { IScrapboxOptions } from "./scrapbox";
+
 export default {
   uploadDir: "uploads",
   formats: [
@@ -14,6 +16,11 @@ export default {
       value: "markdown",
       ext: "md",
       mime: "text/plain",
+      options: {
+        filter: null,
+        openings: [],
+        endings: [],
+      } as IScrapboxOptions,
     },
     { id: "reStructuredText (.rst)", value: "rst", mime: "text/plain" },
     { id: "Rich Text Format (.rtf)", value: "rtf", mime: "application/rtf" },
