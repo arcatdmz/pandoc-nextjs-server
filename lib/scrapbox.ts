@@ -1,8 +1,7 @@
 import { extname } from "path";
 import { convert } from "sb2md";
 
-import { pandoc } from "./pandoc";
-import { readFile, writeFile, unlink } from "fs";
+import { readFile, writeFile } from "fs";
 
 export interface IScrapboxResult {
   success: boolean;
@@ -17,6 +16,8 @@ export interface IScrapboxOptions {
   openings: string[];
   /** section endings */
   endings: string[];
+  /** skip blank pages */
+  skipBlankPages: boolean;
 }
 
 interface IScrapboxPage {
@@ -69,7 +70,7 @@ export async function scrapbox(
   }
 
   // convert Scrapbox exported data into Markdown
-  const { filter } = options;
+  const { filter, skipBlankPages } = options;
   let pages: IScrapboxPage[] = filter
     ? data.pages.filter((p) => filter.test(p.title))
     : data.pages;
@@ -77,14 +78,28 @@ export async function scrapbox(
     .sort((a, b) => a.title.localeCompare(b.title))
     .map((p) => {
       const lines = processLines(p.lines, options);
-      return `## ${p.title}\n\n` + convert(lines.slice(1).join("\n"));
+      return lines || !skipBlankPages
+        ? `## [${p.title}](https://scrapbox.io/${data.name}/${p.title})\n\n` +
+            (lines
+              ? (convert(lines.slice(1).join("\n")) as string)
+                  .split("\n")
+                  .map((line) =>
+                    line.replace(
+                      /\[([^\]]+)\]\(\.\/(.+)\.md\)/g,
+                      `[$1](https://scrapbox.io/${data.name}/$2)`
+                    )
+                  )
+                  .join("\n")
+              : "\n")
+        : null;
     })
+    .filter((l) => !!l)
     .join("\n---\n\n");
   const md = `# ${data.displayName}\n${mdBody}\n---\n\ngenerated with [pandoc-nextjs-server](https://github.com/arcatdmz/pandoc-nextjs-server)`;
 
   // write Markdown and return the result
   return new Promise((r) => {
-    const mdFilePath = `${src}.md`;
+    const mdFilePath = `${src}.scrapbox.md`;
     writeFile(mdFilePath, md, (err) => {
       if (err) {
         r({
@@ -107,8 +122,9 @@ function processLines(lines: string[], options: IScrapboxOptions) {
     return lines.slice(0);
   }
   const res = [lines[0]];
-  let started = false;
-  let finished = false;
+  let started = false,
+    finished = false,
+    numLines = 0;
   for (let i = 1; i < lines.length; i++) {
     const line = lines[i];
     let active = false;
@@ -121,7 +137,10 @@ function processLines(lines: string[], options: IScrapboxOptions) {
         active = true;
       }
     }
+    if (active) {
+      numLines++;
+    }
     res.push(active ? line : `<!-- ${line} -->`);
   }
-  return res;
+  return numLines > 0 ? res : null;
 }

@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { resolve } from "path";
-import { unlink } from "fs";
+import { unlink, copyFileSync } from "fs";
 
 import appConfig from "../../lib/config";
 import { IStatus, writeMetaFile } from "../../lib/writeMetaFile";
@@ -43,10 +43,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   // start conversion
   const path = resolve(appConfig.uploadDir, status.name);
   const format = appConfig.formats.find((f) => f.value === status.format);
-  const result = await scrapbox(
-    path,
-    appConfig.formats.find((f) => f.value === "markdown").options
-  );
+  const result = await scrapbox(path, appConfig.scrapbox.options);
 
   // clean up source file
   unlink(path, (_err) => {
@@ -62,21 +59,34 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
     // proceed to pandoc conversion
     const src = result.path;
-    pandoc(src, `${path}.${format.ext || format.value}`, format.value, []).then(
-      (res) => {
-        status.success = res.success;
-        status.error = res.error;
-        status.result = res.result;
 
-        // update meta file
-        writeMetaFile(status);
+    if (format.value === "markdown") {
+      copyFileSync(src, `${path}.${format.ext || format.value}`);
+      status.success = true;
+      status.error = null;
+      status.result = null;
 
-        // clean up intermediate Markdown file
-        unlink(src, (_err) => {
-          // do nothing on clean up error
-        });
-      }
-    );
+      // update meta file
+      writeMetaFile(status);
+    } else {
+      const res = await pandoc(
+        src,
+        `${path}.${format.ext || format.value}`,
+        format.value,
+        []
+      );
+      status.success = res.success;
+      status.error = res.error;
+      status.result = res.result;
+    }
+
+    // update meta file
+    writeMetaFile(status);
+
+    // clean up intermediate Markdown file
+    unlink(src, (_err) => {
+      // do nothing on clean up error
+    });
 
     delete result.path;
   }
