@@ -57,7 +57,7 @@ const Index: NextPage = () => {
         }
         setLoading(false);
         setStatus(status);
-        if (status.scrapbox) {
+        if (status?.scrapbox) {
           setPolling(false);
         } else {
           setTimeout(doFetch, 1000);

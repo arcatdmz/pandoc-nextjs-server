@@ -18,13 +18,14 @@ export async function readMetaFile(file: string): Promise<any> {
 
   // return file status
   const sanitizedPath = resolve(appConfig.uploadDir, `${sanitized}.meta.json`);
-  return new Promise((r) =>
+  return new Promise((resolve, reject) =>
     readFile(sanitizedPath, (err, data) => {
       if (err) {
-        throw new Error("File not found");
+        reject(new Error("File not found"));
+        return;
       }
       const status = JSON.parse(data.toString());
-      r(status);
+      resolve(status);
     })
   );
 }
