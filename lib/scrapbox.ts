@@ -94,7 +94,7 @@ export async function scrapbox(
         : null;
     })
     .filter((l) => !!l)
-    .join("\n---\n\n");
+    .join("\n\n---\n\n\n");
   const md = `# ${data.displayName}\n${mdBody}\n---\n\ngenerated with [pandoc-nextjs-server](https://github.com/arcatdmz/pandoc-nextjs-server)`;
 
   // write Markdown and return the result
