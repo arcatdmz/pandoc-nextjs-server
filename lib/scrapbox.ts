@@ -11,7 +11,7 @@ export interface IScrapboxResult {
 
 export interface IScrapboxOptions {
   /** page name filter */
-  filter: RegExp;
+  filter: RegExp | ((page: IScrapboxPage) => boolean);
   /** section openings */
   openings: string[];
   /** section endings */
@@ -20,7 +20,7 @@ export interface IScrapboxOptions {
   skipBlankPages: boolean;
 }
 
-interface IScrapboxPage {
+export interface IScrapboxPage {
   title: string;
   created: string;
   updated: string;
@@ -72,7 +72,11 @@ export async function scrapbox(
   // convert Scrapbox exported data into Markdown
   const { filter, skipBlankPages } = options;
   let pages: IScrapboxPage[] = filter
-    ? data.pages.filter((p) => filter.test(p.title))
+    ? data.pages.filter(
+        filter instanceof RegExp
+          ? (p: IScrapboxPage) => filter.test(p.title)
+          : filter
+      )
     : data.pages;
   const mdBody = pages
     .sort((a, b) => a.title.localeCompare(b.title))
