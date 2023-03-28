@@ -73,7 +73,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         src,
         `${path}.${format.ext || format.value}`,
         format.value,
-        []
+        ["--from", "markdown-yaml_metadata_block"]
       );
       status.success = res.success;
       status.error = res.error;
