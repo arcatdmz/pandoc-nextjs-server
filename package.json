@@ -13,26 +13,30 @@
   "dependencies": {
     "@types/formidable": "^1.0.31",
     "axios": "^0.21.1",
-    "baseui": "^9.67.2",
+    "baseui": "^16.1.1",
     "formidable": "^1.2.2",
-    "next": "^10.0.6",
-    "react": "^17.0.1",
-    "react-dom": "^17.0.1",
+    "next": "^14.2.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "sanitize-filename": "^1.6.3",
     "sb2md": "https://github.com/arcatdmz/sb2md.git",
-    "styletron-engine-atomic": "^1.4.6",
-    "styletron-react": "^5.2.7",
+    "styletron-engine-atomic": "^1.6.2",
+    "styletron-react": "^6.1.1",
     "uuid": "^7.0.3"
   },
   "devDependencies": {
-    "@types/node": "^14.14.25",
-    "@types/react": "^17.0.1",
-    "@types/react-dom": "^17.0.0",
+    "@types/node": "^22.0.0",
+    "@types/react": "18.3.28",
+    "@types/react-dom": "18.3.7",
     "@types/styletron-engine-atomic": "^1.1.0",
     "@types/styletron-react": "^5.0.2",
     "@types/styletron-standard": "^2.0.0",
     "@types/uuid": "^7.0.2",
     "cross-env": "^7.0.2",
-    "typescript": "^4.1.4"
+    "typescript": "^5.4.0"
+  },
+  "overrides": {
+    "@types/react": "18.3.28",
+    "@types/react-dom": "18.3.7"
   }
 }
