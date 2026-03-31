@@ -30,6 +30,7 @@ export async function pandoc(
           success: false,
           error: err.message,
         });
+        console.error(err);
         return;
       }
       args.unshift(src);
@@ -62,12 +63,13 @@ export async function pandoc(
           error: stdErr,
         });
       });
-      pdSpawn.on("error", (err) =>
+      pdSpawn.on("error", (err) => {
         r({
           success: false,
           error: err.message,
-        })
-      );
+        });
+        console.error(err);
+      });
     };
 
     stat(src, onStatCheck);

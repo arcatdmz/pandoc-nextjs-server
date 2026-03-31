@@ -1,8 +1,6 @@
-import { unlink } from "fs";
-
 import { pandoc } from "./pandoc";
-import { writeMetaFile, IStatus } from "./writeMetaFile";
 import { parseScrapbox } from "./scrapbox";
+import { IStatus, writeMetaFile } from "./writeMetaFile";
 
 export async function convert(
   src: string,
@@ -28,8 +26,8 @@ export async function convert(
     writeMetaFile(status);
 
     // clean up source file
-    unlink(src, (_err) => {
-      // do nothing on clean up error
-    });
+    // unlink(src, (_err) => {
+    //   // do nothing on clean up error
+    // });
   });
 }

@@ -53,6 +53,7 @@ function parseScrapboxData(data: string) {
       ? json
       : null;
   } catch (e) {
+    console.error(e);
     return null;
   }
 }
@@ -110,6 +111,7 @@ export async function scrapbox(
           success: false,
           error: err.message,
         });
+        console.error(err);
         return;
       }
       r({

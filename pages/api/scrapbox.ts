@@ -1,12 +1,12 @@
+import { copyFileSync, readFileSync, writeFileSync } from "fs";
 import { NextApiRequest, NextApiResponse } from "next";
 import { resolve } from "path";
-import { unlink, copyFileSync } from "fs";
 
 import appConfig from "../../lib/config";
-import { IStatus, writeMetaFile } from "../../lib/writeMetaFile";
+import { pandoc } from "../../lib/pandoc";
 import { readMetaFile } from "../../lib/readMetaFile";
 import { scrapbox } from "../../lib/scrapbox";
-import { pandoc } from "../../lib/pandoc";
+import { IStatus, writeMetaFile } from "../../lib/writeMetaFile";
 
 export const config = {
   api: {
@@ -46,9 +46,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const result = await scrapbox(path, appConfig.scrapbox.options);
 
   // clean up source file
-  unlink(path, (_err) => {
-    // do nothing on clean up error
-  });
+  // unlink(path, (_err) => {
+  //   // do nothing on clean up error
+  // });
 
   // start conversion
   if (result.success) {
@@ -69,24 +69,48 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       // update meta file
       writeMetaFile(status);
     } else {
-      const res = await pandoc(
-        src,
-        `${path}.${format.ext || format.value}`,
-        format.value,
-        ["--from", "markdown-yaml_metadata_block"]
-      );
+      const dest = `${path}.${format.ext || format.value}`;
+      const res = await pandoc(src, dest, format.value, [
+        "--from",
+        "markdown-yaml_metadata_block",
+      ]);
       status.success = res.success;
       status.error = res.error;
       status.result = res.result;
+
+      if (format.value === "html") {
+        const text = readFileSync(dest, "utf8");
+        writeFileSync(
+          dest,
+          text
+            .split(/\r?\n/g)
+            .map((line) =>
+              line === "<hr />"
+                ? '<hr class="page-divider" />'
+                : line ===
+                  '<p><a href="https://scrapbox.io/arcatdmz/hr.icon">hr.icon</a><br />'
+                ? '<hr class="inpage-divider" /><p>'
+                : line ===
+                  '<a href="https://scrapbox.io/arcatdmz/hr.icon">hr.icon</a></p>'
+                ? '</p><hr class="inpage-divider" />'
+                : line ===
+                  '<a href="https://scrapbox.io/arcatdmz/hr.icon">hr.icon</a><br />'
+                ? '<hr class="inpage-divider" />'
+                : line
+            )
+            .join("\n"),
+          "utf8"
+        );
+      }
     }
 
     // update meta file
     writeMetaFile(status);
 
     // clean up intermediate Markdown file
-    unlink(src, (_err) => {
-      // do nothing on clean up error
-    });
+    // unlink(src, (_err) => {
+    //   // do nothing on clean up error
+    // });
 
     delete result.path;
   }
