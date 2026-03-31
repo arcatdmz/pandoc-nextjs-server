@@ -1,18 +1,18 @@
-import { useEffect, useState, useCallback } from "react";
-import { NextPage } from "next";
-import Router, { useRouter } from "next/router";
 import axios from "axios";
 import { useStyletron } from "baseui";
 import { FlexGrid, FlexGridItem } from "baseui/flex-grid";
-import { StyledSpinnerNext as Spinner } from "baseui/spinner";
-import { ParagraphMedium, HeadingSmall } from "baseui/typography";
+import { Spinner } from "baseui/spinner";
+import { HeadingSmall, ParagraphMedium } from "baseui/typography";
+import { NextPage } from "next";
+import { useRouter } from "next/router";
+import { useCallback, useEffect, useState } from "react";
 
 import { Layout } from "../../components/Layout";
 import { PandocStep } from "../../components/Steps";
 import { UploadStatus } from "../../components/UploadStatus";
 
-import { IStatus } from "../../lib/writeMetaFile";
 import { ScrapboxForm } from "../../components/ScrapboxForm";
+import { IStatus } from "../../lib/writeMetaFile";
 
 const Index: NextPage = () => {
   const [file, setFile] = useState<string>(null);
@@ -20,8 +20,8 @@ const Index: NextPage = () => {
   const [polling, setPolling] = useState<boolean>(true);
   const [status, setStatus] = useState<IStatus>(null);
   const [css] = useStyletron();
-
   const router = useRouter();
+
   useEffect(() => {
     if (router.asPath !== router.route) {
       setFile(router.query.file as string);
@@ -67,9 +67,12 @@ const Index: NextPage = () => {
     return () => (doFetch = null);
   }, [fetch, polling]);
 
-  const handleDownload = useCallback((name: string) => {
-    Router.push(`/download/${name}`);
-  }, []);
+  const handleDownload = useCallback(
+    (name: string) => {
+      router.push(`/download/${name}`);
+    },
+    [router],
+  );
 
   const handleSubmit = useCallback(() => {
     setPolling(true);

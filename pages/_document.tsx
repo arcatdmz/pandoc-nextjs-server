@@ -1,22 +1,38 @@
-import Document, { Head, Main, NextScript } from "next/document";
+import Document, {
+  Html,
+  Head,
+  Main,
+  NextScript,
+  DocumentContext,
+  DocumentInitialProps,
+} from "next/document";
 import { Provider as StyletronProvider } from "styletron-react";
-import { Server, Sheet } from "styletron-engine-atomic";
+import { Server } from "styletron-engine-atomic";
+import type { sheetT as StyletronSheet } from "styletron-engine-atomic/lib/server/server";
 import { styletron } from "../lib/styletron";
 
-class MyDocument extends Document<{ stylesheets: Sheet[] }> {
-  static getInitialProps(props: any) {
-    const page = props.renderPage((App: any) => (props: any) => (
-      <StyletronProvider value={styletron}>
-        <App {...props} />
-      </StyletronProvider>
-    ));
+class MyDocument extends Document<{ stylesheets: StyletronSheet[] }> {
+  static async getInitialProps(
+    ctx: DocumentContext
+  ): Promise<DocumentInitialProps & { stylesheets: StyletronSheet[] }> {
+    const originalRenderPage = ctx.renderPage;
+    ctx.renderPage = () =>
+      originalRenderPage({
+        enhanceApp: (App: any) => (props: any) =>
+          (
+            <StyletronProvider value={styletron}>
+              <App {...props} />
+            </StyletronProvider>
+          ),
+      });
+    const initialProps = await Document.getInitialProps(ctx);
     const stylesheets = (styletron as Server).getStylesheets() || [];
-    return { ...page, stylesheets };
+    return { ...initialProps, stylesheets };
   }
 
   render() {
     return (
-      <html>
+      <Html>
         <Head>
           {this.props.stylesheets.map((sheet, i) => (
             <style
@@ -33,7 +49,7 @@ class MyDocument extends Document<{ stylesheets: Sheet[] }> {
           <Main />
           <NextScript />
         </body>
-      </html>
+      </Html>
     );
   }
 }

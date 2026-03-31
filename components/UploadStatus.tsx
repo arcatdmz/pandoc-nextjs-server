@@ -18,7 +18,7 @@ export const UploadStatus: FC<IProps> = ({
   const [css] = useStyletron();
   const handleClick = useCallback(() => {
     onDownload(name);
-  }, [status]);
+  }, [name]);
   return (
     <ul
       className={css({

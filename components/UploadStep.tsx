@@ -1,7 +1,7 @@
 import { useState, useCallback, FC } from "react";
 import axios from "axios";
 import { FormControl } from "baseui/form-control";
-import { FileUploader } from "baseui/file-uploader";
+import { FileUploaderBasic } from "baseui/file-uploader-basic";
 
 import {
   IFileFormat,
@@ -80,7 +80,7 @@ export const UploadStep: FC<IProps> = ({ onUpload }) => {
       <FormControl label="Destination file format:">
         <FileFormatSelect onSelect={setFormat} />
       </FormControl>
-      <FileUploader
+      <FileUploaderBasic
         multiple={false}
         onCancel={handleCancel}
         onDrop={handleDrop}

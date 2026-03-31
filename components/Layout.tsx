@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, PropsWithChildren } from "react";
 import Head from "next/head";
 import { useStyletron } from "baseui";
 import { FlexGrid, FlexGridItem } from "baseui/flex-grid";
@@ -12,12 +12,16 @@ interface IProps {
   step: PandocStep;
 }
 
-export const Layout: FC<IProps> = ({ title, step, children }) => {
+export const Layout: FC<PropsWithChildren<IProps>> = ({
+  title,
+  step,
+  children,
+}) => {
   const [css] = useStyletron();
   return (
     <>
       <Head>
-        <title>{title ? `${title} | ` : ""}pandoc-nextjs-server</title>
+        <title>{title ? `${title} | pandoc-nextjs-server` : "pandoc-nextjs-server"}</title>
         <link
           rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/github-fork-ribbon-css/0.2.3/gh-fork-ribbon.min.css"
